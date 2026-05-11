@@ -6953,6 +6953,7 @@ components:
         frame:
           type: integer
           readOnly: true
+          nullable: true
         type:
           allOf:
           - $ref: '#/components/schemas/AnnotationConflictType'
@@ -6961,6 +6962,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AnnotationId'
+        attributes:
+          type: array
+          items:
+            type: string
         report_id:
           type: integer
           readOnly: true
@@ -6975,11 +6980,13 @@ components:
       - tag
       - shape
       - track
+      - interval
       type: string
       description: |-
         * `tag` - TAG
         * `shape` - SHAPE
         * `track` - TRACK
+        * `interval` - INTERVAL
     AnnotationConflictSeverity:
       enum:
       - warning
@@ -10059,6 +10066,10 @@ components:
             accuracy in cases there are no annotations. If disabled, frames without annotations
             are counted as not matching (accuracy is 0). If enabled, accuracy will be 1 instead.
             This will also add virtual annotations to empty frames in the comparison results.
+        transcription_requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatchedTranscriptionRequirementRequest'
     PatchedTaskValidationLayoutWriteRequest:
       type: object
       properties:
@@ -10122,6 +10133,20 @@ components:
           type: integer
           writeOnly: true
           nullable: true
+    PatchedTranscriptionRequirementRequest:
+      type: object
+      properties:
+        attribute_id:
+          type: integer
+          description: |
+            The transcription (type 'text') attribute to apply the requirement to
+        metric:
+          $ref: '#/components/schemas/TranscriptionQualityMetric'
+        acceptance_threshold:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
     PatchedUserRequest:
       type: object
       properties:
@@ -10677,6 +10702,10 @@ components:
             accuracy in cases there are no annotations. If disabled, frames without annotations
             are counted as not matching (accuracy is 0). If enabled, accuracy will be 1 instead.
             This will also add virtual annotations to empty frames in the comparison results.
+        transcription_requirements:
+          type: array
+          items:
+            $ref: '#/components/schemas/TranscriptionRequirement'
         created_date:
           type: string
           format: date-time
@@ -11577,6 +11606,30 @@ components:
       required:
       - frame
       - type
+    TranscriptionQualityMetric:
+      enum:
+      - wer
+      - cer
+      type: string
+      description: |-
+        * `wer` - WER
+        * `cer` - CER
+    TranscriptionRequirement:
+      type: object
+      properties:
+        attribute_id:
+          type: integer
+          description: |
+            The transcription (type 'text') attribute to apply the requirement to
+        metric:
+          $ref: '#/components/schemas/TranscriptionQualityMetric'
+        acceptance_threshold:
+          type: number
+          format: double
+          maximum: 1
+          minimum: 0
+      required:
+      - attribute_id
     User:
       type: object
       properties:
