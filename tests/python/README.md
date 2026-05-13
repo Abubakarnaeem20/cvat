@@ -51,7 +51,7 @@ When you have a new use case which cannot be expressed using objects already
 available in the system like comments, users, issues, please use the following
 procedure to add them:
 
-1. Run a clean CVAT instance and restore DB and data volume
+1. Run a clean CVAT instance and restore the test runtime state
    ```console
    pytest tests/python up
    ```
@@ -103,7 +103,8 @@ python tests/python/shared/utils/dump_objects.py
 ```
 
 Use `pytest tests/python reuse` instead of `up` when you want to work with an already-running
-test stack and keep its current DB, Redis, ClickHouse, and CVAT data state.
+test stack and keep its current DB, Redis, ClickHouse, and CVAT data state. Use
+`pytest tests/python restore` to reset that stack back to the test assets.
 
 ## How to restore DB and data volume?
 
