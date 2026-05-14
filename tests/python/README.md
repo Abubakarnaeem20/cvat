@@ -45,6 +45,14 @@ which are used by containers for the testing system.
   See the [contributing guide](../../site/content/en/docs/contributing/running-tests.md)
   to get more information about tests running.
 
+**Runtime lifecycle commands**
+
+- `pytest tests/python build` rebuilds the CVAT server and UI development images.
+- `pytest tests/python up` starts the managed test stack, restores test state, and exits.
+- `pytest tests/python down` stops the managed test stack and removes its volumes.
+- `pytest tests/python dumpdb` updates `tests/python/shared/assets/cvat_db/data.json`
+  from a running managed test stack without restoring state first.
+
 ## How to upgrade testing assets?
 
 When you have a new use case which cannot be expressed using objects already
@@ -82,15 +90,12 @@ for i, color in enumerate(colormap):
 To backup DB and data volume, please use commands below.
 
 ```console
-docker exec test_cvat_server_1 python manage.py dumpdata --indent 2 --natural-foreign \
-    --exclude=admin --exclude=auth.permission --exclude=authtoken --exclude=contenttypes \
-    --exclude=django_rq --exclude=sessions \
-    > tests/python/shared/assets/cvat_db/data.json
+pytest tests/python dumpdb
 docker exec test_cvat_server_1 tar --exclude "/home/django/data/cache" -cjv /home/django/data > tests/python/shared/assets/cvat_db/cvat_data.tar.bz2
 ```
 
-> Note: if you won't be use --indent options or will be use with other value
-> it potentially will lead to problems with merging of this file with other branch.
+> Note: `dumpdb` uses `--indent 2`. If you dump `data.json` manually without
+> this option or with another value, it can lead to merge problems.
 
 ## How to update *.json files in the assets directory?
 
@@ -101,10 +106,6 @@ files as well, run the appropriate script:
 pytest tests/python up
 python tests/python/shared/utils/dump_objects.py
 ```
-
-Use `pytest tests/python reuse` instead of `up` when you want to work with an already-running
-test stack and keep its current DB, Redis, ClickHouse, and CVAT data state. Use
-`pytest tests/python restore` to reset that stack back to the test assets.
 
 ## How to restore DB and data volume?
 
